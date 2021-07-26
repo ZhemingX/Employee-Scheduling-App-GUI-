@@ -67,18 +67,40 @@ def schedule_departs(num_departs, num_shifts, num_days, depart_cons):
     solver = cp_model.CpSolver()
 
     status = solver.Solve(model)
+    
 
     if status == cp_model.OPTIMAL:
+        res = []
         for d in all_days:
-                print('Day %i' % d)
-                for n in all_departs:
-                    is_working = False
-                    for s in all_shifts:
-                        if solver.Value(shifts[(n,d,s)]):
-                            is_working = True
-                            print('  Nurse %i works shift %i' % (n, s))
-                    if not is_working:
-                        continue
+            row = [0 for i in all_shifts]
+            for n in all_departs:
+                is_working = False
+                for s in all_shifts:
+                    if solver.Value(shifts[(n,d,s)]):
+                        is_working = True
+                        row[s] = n
+                if not is_working:
+                    continue
+            res.append(row)
+        
+        #print(res)
+            
+        # for d in all_days:
+        #         print('Day %i' % d)
+        #         for n in all_departs:
+        #             is_working = False
+        #             for s in all_shifts:
+        #                 if solver.Value(shifts[(n,d,s)]):
+        #                     is_working = True
+        #                     print('  Nurse %i works shift %i' % (n, s))
+        #             if not is_working:
+        #                 continue
+        
+        return (True, res)
+    
+    else:
+        return (False, [])
 
 
-schedule_departs(39,6,30,depart_cons)
+
+#schedule_departs(37,6,31,depart_cons)
