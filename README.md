@@ -25,13 +25,14 @@ python .\content_view.py
 ```
 Here are the basic steps:
 
-&nbsp;&nbsp;select the year and month
+&nbsp;&nbsp;**1. select the year and month**
 
-&nbsp;&nbsp;choose the target departments and set their constraints (add mode / delete mode)
+&nbsp;&nbsp;**2. choose the target departments and set their constraints (add mode / delete mode)**
 
-&nbsp;&nbsp;click the generate button, wait a while then you could see the finishing .docx file in the app folder (if not succeed, the app will exit)
+&nbsp;&nbsp;**3. click the generate button, wait a while then you could see the finishing .docx file in the app folder (if not succeed, the app will exit)**
 
 Here are some figures of the app:
+
 
 
 
