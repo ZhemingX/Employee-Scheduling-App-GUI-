@@ -36,7 +36,7 @@ Here are some figures of the app:
 .<img src="https://github.com/ZhemingX/Employee-Scheduling-App-GUI-/blob/main/display_images/app_cover.jpg" width="250" height="220" />
 .<img src="https://github.com/ZhemingX/Employee-Scheduling-App-GUI-/blob/main/display_images/add_mode.jpg" width="250" height="220" />
 .<img src="https://github.com/ZhemingX/Employee-Scheduling-App-GUI-/blob/main/display_images/delete_mode.jpg" width="250" height="220" />
-.<img src="https://github.com/ZhemingX/Employee-Scheduling-App-GUI-/blob/main/display_images/add_cover.jpg" width="250" height="220" />
+.<img src="https://github.com/ZhemingX/Employee-Scheduling-App-GUI-/blob/main/display_images/output_cover.jpg" width="250" height="220" />
 .<img src="https://github.com/ZhemingX/Employee-Scheduling-App-GUI-/blob/main/display_images/doc.jpg" width="250" height="220" />
 
 
