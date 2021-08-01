@@ -1,14 +1,15 @@
 from ortools.sat.python import cp_model
 from util import list_split
 
-depart_cons = [set([]) for i in range(39)]
-depart_cons[0] |= set([1,3,5,7])
-depart_cons[2] |= set([i for i in range(20)])
+def schedule_departs(depart_list, num_shifts, num_days, depart_cons):
 
-#print(depart_cons)
-
-def schedule_departs(num_departs, num_shifts, num_days, depart_cons):
-
+    # exclude non-use departs
+    depart_list_copy = depart_list[:]
+    num_departs_copy = len(depart_list_copy)
+    depart_list_copy = [depart_list_copy[i] for i in range(num_departs_copy) if len(depart_cons[i]) != num_days]
+    depart_cons_copy = [depart_cons[i] for i in range(num_departs_copy) if len(depart_cons[i]) != num_days]
+    num_departs = len(depart_list_copy)
+    #
     all_departs = range(num_departs)
     all_shifts = range(num_shifts)
     all_days = range(num_days)
@@ -34,35 +35,34 @@ def schedule_departs(num_departs, num_shifts, num_days, depart_cons):
             model.Add(sum(shifts[(n, d, s)] for s in all_shifts) <= 1)
 
     # Try to distribute the shifts evenly
-
-    # each depart works at least 3 times each month
-    min_shifts_per_depart = 3
+    # Each depart (constraint days <= 8) has at most one shift every 4 days considering the reality
     for n in all_departs:
-        num_shifts_worked = 0
-        for d in all_days:
-            for s in all_shifts:
-                num_shifts_worked += shifts[(n, d, s)]
-        model.Add(min_shifts_per_depart <= num_shifts_worked)
-
-
-    # Each depart has at most one shift every 4 days considering the reality
-    for n in all_departs:
-        for days_split in list_split(all_days, 4):
-            num_shifts_worked = 0
-            for d in days_split:
-                for s in all_shifts:
-                    num_shifts_worked += shifts[(n, d, s)]
-            model.Add(num_shifts_worked <= 1)
+        if len(depart_cons_copy[n]) <= 20:
+            for days_split in list_split(all_days, 4):
+                num_shifts_worked = 0
+                for d in days_split:
+                    for s in all_shifts:
+                        num_shifts_worked += shifts[(n, d, s)]
+                model.Add(num_shifts_worked <= 1)
 
     # Each depart consider its own constraints
     # each depart should not schedule work in any days in its constraints
     for n in all_departs:
         num_shifts_worked = 0
-        for d in depart_cons[n]:
+        for d in depart_cons_copy[n]:
             for s in all_shifts:
                 num_shifts_worked += shifts[(n, d, s)]
         model.Add(num_shifts_worked == 0)
     
+    # Each depart (constraint days > 8) has shift in each non-constraint day
+    for n in all_departs:
+        if len(depart_cons_copy[n]) > 20:
+            num_shifts_worked = 0
+            for d in all_days:
+                for s in all_shifts:
+                    num_shifts_worked += shifts[(n, d, s)]
+            model.Add(num_shifts_worked == (num_days - len(depart_cons_copy[n])))
+            
     # Creates the solver and solve.
     solver = cp_model.CpSolver()
 
@@ -82,25 +82,9 @@ def schedule_departs(num_departs, num_shifts, num_days, depart_cons):
                 if not is_working:
                     continue
             res.append(row)
-        
-        #print(res)
             
-        # for d in all_days:
-        #         print('Day %i' % d)
-        #         for n in all_departs:
-        #             is_working = False
-        #             for s in all_shifts:
-        #                 if solver.Value(shifts[(n,d,s)]):
-        #                     is_working = True
-        #                     print('  Nurse %i works shift %i' % (n, s))
-        #             if not is_working:
-        #                 continue
-        
-        return (True, res)
+        return (True, res, depart_list_copy)
     
     else:
-        return (False, [])
+        return (False, [], [])
 
-
-
-#schedule_departs(37,6,31,depart_cons)
