@@ -35,7 +35,7 @@ def schedule_departs(depart_list, num_shifts, num_days, depart_cons):
             model.Add(sum(shifts[(n, d, s)] for s in all_shifts) <= 1)
 
     # Try to distribute the shifts evenly
-    # Each depart (constraint days <= 8) has at most one shift every 4 days considering the reality
+    # Each depart (constraint days <= 20) has at most one shift every 4 days considering the reality
     for n in all_departs:
         if len(depart_cons_copy[n]) <= 20:
             for days_split in list_split(all_days, 4):
@@ -54,7 +54,7 @@ def schedule_departs(depart_list, num_shifts, num_days, depart_cons):
                 num_shifts_worked += shifts[(n, d, s)]
         model.Add(num_shifts_worked == 0)
     
-    # Each depart (constraint days > 8) has shift in each non-constraint day
+    # Each depart (constraint days > 20) has shift in each non-constraint day
     for n in all_departs:
         if len(depart_cons_copy[n]) > 20:
             num_shifts_worked = 0
@@ -62,6 +62,15 @@ def schedule_departs(depart_list, num_shifts, num_days, depart_cons):
                 for s in all_shifts:
                     num_shifts_worked += shifts[(n, d, s)]
             model.Add(num_shifts_worked == (num_days - len(depart_cons_copy[n])))
+    
+    # Each depart (no constraint days) has at least 5 shifts each month
+    for n in all_departs:
+        if len(depart_cons_copy[n]) == 0:
+            num_shifts_total = 0
+            for d in all_days:
+                for s in all_shifts:
+                    num_shifts_total += shifts[(n, d, s)]
+            model.Add(num_shifts_total >= 5)
             
     # Creates the solver and solve.
     solver = cp_model.CpSolver()
